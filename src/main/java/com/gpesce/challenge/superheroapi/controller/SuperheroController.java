@@ -13,11 +13,7 @@ public class SuperheroController {
     @GetMapping(value = {"/superheroes"} )
     public ResponseEntity<Object> getSuperheroes(
             @RequestParam(required = false) Optional<String> name) {
-        //throw new UnsupportedOperationException();
-        ResponseDTO response = new ResponseDTO();
-        response.setId(1L);
-        response.setName("Batman");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        throw new UnsupportedOperationException();
     }
 
     @GetMapping("/superheroes/{id}")
