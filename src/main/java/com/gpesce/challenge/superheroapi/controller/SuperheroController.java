@@ -10,10 +10,14 @@ import java.util.Optional;
 @Controller
 public class SuperheroController {
 
-    @GetMapping(value = {"/superheroes", "/superheroes/{name}"} )
+    @GetMapping(value = {"/superheroes"} )
     public ResponseEntity<Object> getSuperheroes(
-            @PathVariable(required = false) Optional<String> name) {
-        throw new UnsupportedOperationException();
+            @RequestParam(required = false) Optional<String> name) {
+        //throw new UnsupportedOperationException();
+        ResponseDTO response = new ResponseDTO();
+        response.setId(1L);
+        response.setName("Batman");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/superheroes/{id}")
