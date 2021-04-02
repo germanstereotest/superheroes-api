@@ -16,4 +16,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, ex, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler(value = { SuperheroAlreadyExistException.class })
+    protected ResponseEntity<Object> handleAlreadyExistException(RuntimeException ex, WebRequest request) {
+        return handleExceptionInternal(ex, ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = { SuperheroBadRequestException.class })
+    protected ResponseEntity<Object> handleBadRequestException(RuntimeException ex, WebRequest request) {
+        return handleExceptionInternal(ex, ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
 }
