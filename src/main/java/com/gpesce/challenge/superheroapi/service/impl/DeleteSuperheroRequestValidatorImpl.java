@@ -1,12 +1,9 @@
 package com.gpesce.challenge.superheroapi.service.impl;
 
 import com.gpesce.challenge.superheroapi.exception.ErrorCodeEnum;
-import com.gpesce.challenge.superheroapi.exception.SuperheroAlreadyExistException;
 import com.gpesce.challenge.superheroapi.exception.SuperheroNotFoundException;
 import com.gpesce.challenge.superheroapi.repository.SuperheroRepository;
-import com.gpesce.challenge.superheroapi.service.CreateSuperheroRequestValidator;
 import com.gpesce.challenge.superheroapi.service.DeleteSuperheroRequestValidator;
-import com.gpesce.challenge.superheroapi.service.dto.CreateSuperheroRequestDTO;
 import org.springframework.stereotype.Component;
 
 @Component

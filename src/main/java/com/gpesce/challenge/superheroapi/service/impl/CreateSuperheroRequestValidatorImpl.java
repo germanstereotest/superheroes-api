@@ -3,7 +3,6 @@ package com.gpesce.challenge.superheroapi.service.impl;
 import com.gpesce.challenge.superheroapi.exception.ErrorCodeEnum;
 import com.gpesce.challenge.superheroapi.exception.SuperheroAlreadyExistException;
 import com.gpesce.challenge.superheroapi.exception.SuperheroBadRequestException;
-import com.gpesce.challenge.superheroapi.exception.SuperheroNotFoundException;
 import com.gpesce.challenge.superheroapi.repository.SuperheroRepository;
 import com.gpesce.challenge.superheroapi.service.CreateSuperheroRequestValidator;
 import com.gpesce.challenge.superheroapi.service.dto.CreateSuperheroRequestDTO;
@@ -24,7 +23,7 @@ public class CreateSuperheroRequestValidatorImpl implements CreateSuperheroReque
         if (superheroRequestDTO.getName() ==  null || superheroRequestDTO.getName().isEmpty()) {
             throw new SuperheroBadRequestException(ErrorCodeEnum.SUPERHERO_NAME_MANDATORY);
         }
-        if (!repository.findByName(superheroRequestDTO.getName()).isEmpty()) {
+        if (repository.findByName(superheroRequestDTO.getName()).isPresent()) {
             throw new SuperheroAlreadyExistException(ErrorCodeEnum.SUPERHERO_DUPLICATED);
         }
     }

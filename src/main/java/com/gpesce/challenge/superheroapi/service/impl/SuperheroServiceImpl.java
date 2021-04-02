@@ -57,7 +57,7 @@ public class SuperheroServiceImpl implements SuperheroService {
     @Override
     public SuperheroResponseDTO findById(Long id) {
         Optional<Superhero> result = repository.findById(id);
-        if (!result.isPresent()){
+        if (result.isEmpty()){
             throw new SuperheroNotFoundException(ErrorCodeEnum.SUPERHERO_NOT_FOUND);
         }
         return modelMapper.map(result.get(), SuperheroResponseDTO.class);

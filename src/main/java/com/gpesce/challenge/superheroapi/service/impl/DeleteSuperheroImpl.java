@@ -3,7 +3,6 @@ package com.gpesce.challenge.superheroapi.service.impl;
 import com.gpesce.challenge.superheroapi.repository.SuperheroRepository;
 import com.gpesce.challenge.superheroapi.service.DeleteSuperhero;
 import com.gpesce.challenge.superheroapi.service.DeleteSuperheroRequestValidator;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -13,13 +12,11 @@ public class DeleteSuperheroImpl implements DeleteSuperhero {
 
     private final DeleteSuperheroRequestValidator deleteSuperheroRequestValidator;
     private final SuperheroRepository repository;
-    private final ModelMapper modelMapper;
 
     public DeleteSuperheroImpl(DeleteSuperheroRequestValidator deleteSuperheroRequestValidator,
-                               SuperheroRepository repository, ModelMapper modelMapper) {
+                               SuperheroRepository repository) {
         this.deleteSuperheroRequestValidator = deleteSuperheroRequestValidator;
         this.repository = repository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
