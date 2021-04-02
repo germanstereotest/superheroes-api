@@ -1,4 +1,4 @@
-package com.gpesce.challenge.superheroapi.controller;
+package com.gpesce.challenge.superheroapi.controller.dto;
 
 import java.util.Objects;
 

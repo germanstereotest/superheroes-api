@@ -1,4 +1,4 @@
-package com.gpesce.challenge.superheroapi.controller;
+package com.gpesce.challenge.superheroapi.controller.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,6 +7,7 @@ public class SuperheroRequestDTO implements Serializable {
 
     private String name;
     private String description;
+
     public SuperheroRequestDTO() {
     }
 
