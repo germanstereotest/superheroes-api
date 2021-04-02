@@ -7,6 +7,7 @@ import com.gpesce.challenge.superheroapi.exception.SuperheroNotFoundException;
 import com.gpesce.challenge.superheroapi.model.Superhero;
 import com.gpesce.challenge.superheroapi.repository.SuperheroRepository;
 import com.gpesce.challenge.superheroapi.service.CreateSuperhero;
+import com.gpesce.challenge.superheroapi.service.DeleteSuperhero;
 import com.gpesce.challenge.superheroapi.service.SuperheroService;
 import com.gpesce.challenge.superheroapi.service.UpdateSuperhero;
 import com.gpesce.challenge.superheroapi.service.dto.CreateSuperheroRequestDTO;
@@ -26,12 +27,15 @@ public class SuperheroServiceImpl implements SuperheroService {
     private final ModelMapper modelMapper;
     private final CreateSuperhero createSuperhero;
     private final UpdateSuperhero updateSuperhero;
+    private final DeleteSuperhero deleteSuperhero;
 
-    public SuperheroServiceImpl(SuperheroRepository repository, ModelMapper modelMapper, CreateSuperhero createSuperhero, UpdateSuperhero updateSuperhero) {
+    public SuperheroServiceImpl(SuperheroRepository repository, ModelMapper modelMapper, CreateSuperhero createSuperhero,
+                                UpdateSuperhero updateSuperhero, DeleteSuperhero deleteSuperhero) {
         this.repository = repository;
         this.modelMapper = modelMapper;
         this.createSuperhero = createSuperhero;
         this.updateSuperhero = updateSuperhero;
+        this.deleteSuperhero = deleteSuperhero;
     }
 
     @Override
@@ -77,7 +81,7 @@ public class SuperheroServiceImpl implements SuperheroService {
 
     @Override
     public void remove(Long id) {
-        throw new UnsupportedOperationException();
+        deleteSuperhero.accept(id);
     }
 
 }
