@@ -109,13 +109,9 @@ public class IntegrationTest {
 
         when(superheroRepository.save(any())).thenReturn(mockCreatedSuperheroResponse());
 
-        SuperheroRequestDTO superhero = new SuperheroRequestDTO();
-        superhero.setName("Batman");
-        superhero.setDescription("DC Hero");
-
         mockMvc.perform(post("/superheroes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(superhero)))
+                .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Hero"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id" ).value("5"));
     }
@@ -136,13 +132,9 @@ public class IntegrationTest {
 
         when(superheroRepository.findByName(any())).thenReturn(mockGetOneSuperheroResponse());
 
-        SuperheroRequestDTO superhero = new SuperheroRequestDTO();
-        superhero.setName("Batman");
-        superhero.setDescription("DC Hero");
-
         mockMvc.perform(post("/superheroes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(superhero)))
+                .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Hero"))))
                 .andExpect(status().isBadRequest());
     }
 
@@ -154,13 +146,9 @@ public class IntegrationTest {
         when(superheroRepository.getOne(any())).thenReturn(mockCreatedSuperheroResponse());
         when(superheroRepository.save(any())).thenReturn(mockUpdatedSuperheroResponse());
 
-        SuperheroRequestDTO superhero = new SuperheroRequestDTO();
-        superhero.setName("Batman");
-        superhero.setDescription("DC Superhero");
-
         mockMvc.perform(put("/superheroes/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(superhero)))
+                .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Superhero"))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id" ).value("5"))
@@ -176,13 +164,9 @@ public class IntegrationTest {
         when(superheroRepository.getOne(any())).thenReturn(mockCreatedSuperheroResponse());
         when(superheroRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 
-        SuperheroRequestDTO superhero = new SuperheroRequestDTO();
-        superhero.setName("Batman");
-        superhero.setDescription("DC Superhero");
-
         mockMvc.perform(put("/superheroes/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(superhero)))
+                .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Superhero"))))
                 .andExpect(status().isBadRequest());
     }
 
@@ -200,13 +184,9 @@ public class IntegrationTest {
 
         when(superheroRepository.existsById(any())).thenReturn(false);
 
-        SuperheroRequestDTO superhero = new SuperheroRequestDTO();
-        superhero.setName("Batman");
-        superhero.setDescription("DC Superhero");
-
         mockMvc.perform(put("/superheroes/999999")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(superhero)))
+                .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Superhero"))))
                 .andExpect(status().isNotFound());
     }
 
