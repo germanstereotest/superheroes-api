@@ -2,14 +2,17 @@ package com.gpesce.challenge.superheroapi.service.impl;
 
 import com.gpesce.challenge.superheroapi.controller.dto.SuperheroResponseDTO;
 import com.gpesce.challenge.superheroapi.exception.ErrorCodeEnum;
+import com.gpesce.challenge.superheroapi.exception.SuperheroAlreadyExistException;
 import com.gpesce.challenge.superheroapi.exception.SuperheroNotFoundException;
 import com.gpesce.challenge.superheroapi.model.Superhero;
 import com.gpesce.challenge.superheroapi.repository.SuperheroRepository;
 import com.gpesce.challenge.superheroapi.service.CreateSuperhero;
 import com.gpesce.challenge.superheroapi.service.SuperheroService;
+import com.gpesce.challenge.superheroapi.service.UpdateSuperhero;
 import com.gpesce.challenge.superheroapi.service.dto.CreateSuperheroRequestDTO;
 import com.gpesce.challenge.superheroapi.service.dto.UpdateSuperheroRequestDTO;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +25,13 @@ public class SuperheroServiceImpl implements SuperheroService {
     private final SuperheroRepository repository;
     private final ModelMapper modelMapper;
     private final CreateSuperhero createSuperhero;
+    private final UpdateSuperhero updateSuperhero;
 
-    public SuperheroServiceImpl(SuperheroRepository repository, ModelMapper modelMapper, CreateSuperhero createSuperhero) {
+    public SuperheroServiceImpl(SuperheroRepository repository, ModelMapper modelMapper, CreateSuperhero createSuperhero, UpdateSuperhero updateSuperhero) {
         this.repository = repository;
         this.modelMapper = modelMapper;
         this.createSuperhero = createSuperhero;
+        this.updateSuperhero = updateSuperhero;
     }
 
     @Override
@@ -61,7 +66,13 @@ public class SuperheroServiceImpl implements SuperheroService {
 
     @Override
     public SuperheroResponseDTO modify(UpdateSuperheroRequestDTO superhero) {
-        throw new UnsupportedOperationException();
+        SuperheroResponseDTO result;
+        try {
+            result = updateSuperhero.apply(superhero);
+        } catch (DataIntegrityViolationException exception) {
+            throw new SuperheroAlreadyExistException(ErrorCodeEnum.SUPERHERO_DUPLICATED);
+        }
+        return result;
     }
 
     @Override
