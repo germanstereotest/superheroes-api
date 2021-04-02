@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -52,6 +53,19 @@ public class IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.length()", is(4)));
+    }
+
+    @DisplayName("Testing Find all by name Found: 200")
+    @Test
+    public void testGetAllByNameSuperherosFound() throws Exception{
+
+        when(superheroRepository.findByNameContainingIgnoreCase(any())).thenReturn(mockGetAllSuperheroesByNameResponse());
+
+        mockMvc.perform(get("/superheroes")
+                .queryParam("name", "man"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.length()", is(3)));
     }
 
     @DisplayName("Testing Find all Empty: 200")
@@ -154,6 +168,24 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.description").value("DC Superhero"));
     }
 
+    @DisplayName("Testing Modification name for another existing superhero Bad request: 400")
+    @Test
+    public void testPutSuperheroExisting() throws Exception{
+
+        when(superheroRepository.existsById(any())).thenReturn(true);
+        when(superheroRepository.getOne(any())).thenReturn(mockCreatedSuperheroResponse());
+        when(superheroRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
+
+        SuperheroRequestDTO superhero = new SuperheroRequestDTO();
+        superhero.setName("Batman");
+        superhero.setDescription("DC Superhero");
+
+        mockMvc.perform(put("/superheroes/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(superhero)))
+                .andExpect(status().isBadRequest());
+    }
+
     @DisplayName("Testing Modification BAD: 400")
     @Test
     public void testPutSuperheroBadRequest() throws Exception{
@@ -223,6 +255,28 @@ public class IntegrationTest {
         s4.setId(4L);
         s4.setName("Manolito el fuerte");
         mockedSuperheroes.add(s4);
+
+        return mockedSuperheroes;
+    }
+
+    private List<Superhero> mockGetAllSuperheroesByNameResponse() {
+        List<Superhero> mockedSuperheroes = new ArrayList<>();
+        Superhero s1 = new Superhero();
+        s1.setId(1L);
+        s1.setName("Spiderman");
+        s1.setDescription("Marvel Hero");
+        mockedSuperheroes.add(s1);
+
+        Superhero s2 = new Superhero();
+        s2.setId(2L);
+        s2.setName("Superman");
+        s2.setDescription("DC Hero");
+        mockedSuperheroes.add(s2);
+
+        Superhero s3 = new Superhero();
+        s3.setId(4L);
+        s3.setName("Manolito el fuerte");
+        mockedSuperheroes.add(s3);
 
         return mockedSuperheroes;
     }
