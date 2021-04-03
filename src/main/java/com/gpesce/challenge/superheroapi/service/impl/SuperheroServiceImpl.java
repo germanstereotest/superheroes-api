@@ -13,6 +13,9 @@ import com.gpesce.challenge.superheroapi.service.UpdateSuperhero;
 import com.gpesce.challenge.superheroapi.service.dto.CreateSuperheroRequestDTO;
 import com.gpesce.challenge.superheroapi.service.dto.UpdateSuperheroRequestDTO;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames={"superheroes"})
 public class SuperheroServiceImpl implements SuperheroService {
 
     private final SuperheroRepository repository;
@@ -38,6 +42,7 @@ public class SuperheroServiceImpl implements SuperheroService {
         this.deleteSuperhero = deleteSuperhero;
     }
 
+    @CachePut(value="superheroes", unless="#result.isEmpty()")
     @Override
     public List<SuperheroResponseDTO> findAll() {
         return repository.findAll()
@@ -46,6 +51,7 @@ public class SuperheroServiceImpl implements SuperheroService {
                 .collect(Collectors.toList());
     }
 
+    @CachePut(value="superheroes", key="#name", unless="#result.isEmpty()")
     @Override
     public List<SuperheroResponseDTO> findAllLikeName(String name) {
         return repository.findByNameContainingIgnoreCase(name)
@@ -54,6 +60,7 @@ public class SuperheroServiceImpl implements SuperheroService {
                 .collect(Collectors.toList());
     }
 
+    @CachePut(value="superheroes", key="#id")
     @Override
     public SuperheroResponseDTO findById(Long id) {
         Optional<Superhero> result = repository.findById(id);
@@ -63,11 +70,13 @@ public class SuperheroServiceImpl implements SuperheroService {
         return modelMapper.map(result.get(), SuperheroResponseDTO.class);
     }
 
+    @CacheEvict(value = "superheroes", allEntries = true)
     @Override
     public SuperheroResponseDTO create(CreateSuperheroRequestDTO superhero) {
         return createSuperhero.apply(superhero);
     }
 
+    @CacheEvict(value = "superheroes", allEntries = true)
     @Override
     public SuperheroResponseDTO modify(UpdateSuperheroRequestDTO superhero) {
         SuperheroResponseDTO result;
@@ -79,6 +88,7 @@ public class SuperheroServiceImpl implements SuperheroService {
         return result;
     }
 
+    @CacheEvict(value = "superheroes", allEntries = true)
     @Override
     public void remove(Long id) {
         deleteSuperhero.accept(id);
