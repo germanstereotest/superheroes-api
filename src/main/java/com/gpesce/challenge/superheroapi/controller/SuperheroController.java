@@ -2,6 +2,7 @@ package com.gpesce.challenge.superheroapi.controller;
 
 import com.gpesce.challenge.superheroapi.controller.dto.SuperheroRequestDTO;
 import com.gpesce.challenge.superheroapi.controller.dto.SuperheroResponseDTO;
+import com.gpesce.challenge.superheroapi.profiler.ExecTimeMeasurement;
 import com.gpesce.challenge.superheroapi.service.SuperheroService;
 import com.gpesce.challenge.superheroapi.service.dto.CreateSuperheroRequestDTO;
 import com.gpesce.challenge.superheroapi.service.dto.UpdateSuperheroRequestDTO;
@@ -22,6 +23,7 @@ public class SuperheroController {
         this.superheroService = superheroService;
     }
 
+    @ExecTimeMeasurement
     @GetMapping(value = {"/superheroes"} )
     public ResponseEntity<List<SuperheroResponseDTO>> getSuperheroes(
             @RequestParam(required = false) Optional<String> name) {
@@ -35,6 +37,7 @@ public class SuperheroController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @ExecTimeMeasurement
     @GetMapping("/superheroes/{id}")
     public ResponseEntity<SuperheroResponseDTO> getSuperheroesById(
             @PathVariable(required = true) long id) {
@@ -42,6 +45,7 @@ public class SuperheroController {
         return new ResponseEntity<>(superheroService.findById(id), HttpStatus.OK);
     }
 
+    @ExecTimeMeasurement
     @PostMapping("/superheroes")
     public ResponseEntity<SuperheroResponseDTO> createSuperheroes(
             @RequestBody SuperheroRequestDTO superhero) {
@@ -51,6 +55,7 @@ public class SuperheroController {
                 HttpStatus.CREATED);
     }
 
+    @ExecTimeMeasurement
     @PutMapping("/superheroes/{id}")
     public ResponseEntity<SuperheroResponseDTO> modifySuperheroesById(
             @PathVariable(required = true) Long id,
@@ -61,6 +66,7 @@ public class SuperheroController {
                 HttpStatus.OK);
     }
 
+    @ExecTimeMeasurement
     @DeleteMapping("/superheroes/{id}")
     public ResponseEntity removeSuperheroesById(
             @PathVariable(required = true) long id) {
