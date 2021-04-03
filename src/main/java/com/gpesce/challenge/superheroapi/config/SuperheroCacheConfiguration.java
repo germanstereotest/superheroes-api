@@ -1,17 +1,26 @@
 package com.gpesce.challenge.superheroapi.config;
 
-import org.springframework.boot.autoconfigure.cache.CacheManagerCustomizer;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 @Component
-public class SuperheroCacheConfiguration
-        implements CacheManagerCustomizer<ConcurrentMapCacheManager> {
+public class SuperheroCacheConfiguration {
 
-    @Override
-    public void customize(ConcurrentMapCacheManager cacheManager) {
-        cacheManager.setCacheNames(Arrays.asList("superheroes"));
+    @Bean
+    @SuppressWarnings("unchecked")
+    public Caffeine caffeineConfig() {
+        return Caffeine.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES);
+    }
+
+    @Bean
+    @SuppressWarnings("unchecked")
+    public CacheManager cacheManager(Caffeine caffeine) {
+        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
+        caffeineCacheManager.setCaffeine(caffeine);
+        return caffeineCacheManager;
     }
 }
