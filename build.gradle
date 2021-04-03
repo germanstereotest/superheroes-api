@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.gpesce.challenge'
-version = '0.0.3-SNAPSHOT'
+version = '0.0.4-SNAPSHOT'
 sourceCompatibility = '11'
 
 repositories {
@@ -18,6 +18,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'com.github.ben-manes.caffeine:caffeine'
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	compile 'org.modelmapper:modelmapper:2.3.3'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
