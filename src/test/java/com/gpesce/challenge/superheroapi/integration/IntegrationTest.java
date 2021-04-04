@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gpesce.challenge.superheroapi.controller.dto.SuperheroRequestDTO;
 import com.gpesce.challenge.superheroapi.model.Superhero;
 import com.gpesce.challenge.superheroapi.repository.SuperheroRepository;
+import com.gpesce.challenge.superheroapi.security.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +15,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,31 +42,44 @@ import static org.mockito.Mockito.when;
 @AutoConfigureMockMvc
 public class IntegrationTest {
 
+    private static final String TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2MTc1MDQ2ODEsImV4cCI6MTYxNzUwODI4MX0.t0gF1cyQFqhxisE2SkmsecuLe14Rg0DQuXekTo4kLTg";
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private SuperheroRepository superheroRepository;
 
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
     @DisplayName("Testing Find all Found: 200")
     @Test
     public void testGetAllSuperherosFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.findAll()).thenReturn(mockGetAllSuperheroesResponse());
 
-        mockMvc.perform(get("/superheroes"))
+        mockMvc.perform(get("/api/superheroes").header("Authorization", TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.length()", is(4)));
+    }
+
+    private Authentication mockAuth(String token) {
+        return new UsernamePasswordAuthenticationToken("", token, AuthorityUtils.NO_AUTHORITIES);
     }
 
     @DisplayName("Testing Find all by name Found: 200")
     @Test
     public void testGetAllByNameSuperherosFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.findByNameContainingIgnoreCase(any())).thenReturn(mockGetAllSuperheroesByNameResponse());
 
-        mockMvc.perform(get("/superheroes")
+        mockMvc.perform(get("/api/superheroes").header("Authorization", TOKEN)
                 .queryParam("name", "man"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -72,9 +90,11 @@ public class IntegrationTest {
     @Test
     public void testGetAllSuperherosEmpty() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.findAll()).thenReturn(new ArrayList<>());
 
-        mockMvc.perform(get("/superheroes"))
+        mockMvc.perform(get("/api/superheroes").header("Authorization", TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.length()", is(0)));
@@ -84,9 +104,11 @@ public class IntegrationTest {
     @Test
     public void testGetSuperheroFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.findById(anyLong())).thenReturn(mockGetOneSuperheroResponse());
 
-        mockMvc.perform(get("/superheroes/1"))
+        mockMvc.perform(get("/api/superheroes/1").header("Authorization", TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id" ).value("1"))
@@ -97,9 +119,11 @@ public class IntegrationTest {
     @Test
     public void testGetSuperheroNotFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.findById(anyLong())).thenReturn(mockEmptySuperheroResponse());
 
-        mockMvc.perform(get("/superheroes/999999"))
+        mockMvc.perform(get("/api/superheroes/999999").header("Authorization", TOKEN))
                 .andExpect(status().isNotFound());
     }
 
@@ -107,9 +131,11 @@ public class IntegrationTest {
     @Test
     public void testPostSuperheroCreated() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.save(any())).thenReturn(mockCreatedSuperheroResponse());
 
-        mockMvc.perform(post("/superheroes")
+        mockMvc.perform(post("/api/superheroes").header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Hero"))))
                 .andExpect(status().isCreated())
@@ -120,7 +146,10 @@ public class IntegrationTest {
     @Test
     public void testPostSuperheroBadRequest() throws Exception{
 
-        mockMvc.perform(post("/superheroes")
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
+
+        mockMvc.perform(post("/api/superheroes").header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new SuperheroRequestDTO())))
                 .andExpect(status().isBadRequest());
@@ -130,9 +159,11 @@ public class IntegrationTest {
     @Test
     public void testPostSuperheroExist() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.findByName(any())).thenReturn(mockGetOneSuperheroResponse());
 
-        mockMvc.perform(post("/superheroes")
+        mockMvc.perform(post("/api/superheroes").header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Hero"))))
                 .andExpect(status().isBadRequest());
@@ -142,11 +173,13 @@ public class IntegrationTest {
     @Test
     public void testPutSuperheroFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.existsById(any())).thenReturn(true);
         when(superheroRepository.getOne(any())).thenReturn(mockCreatedSuperheroResponse());
         when(superheroRepository.save(any())).thenReturn(mockUpdatedSuperheroResponse());
 
-        mockMvc.perform(put("/superheroes/1")
+        mockMvc.perform(put("/api/superheroes/1").header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Superhero"))))
                 .andExpect(status().isOk())
@@ -160,11 +193,13 @@ public class IntegrationTest {
     @Test
     public void testPutSuperheroExisting() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.existsById(any())).thenReturn(true);
         when(superheroRepository.getOne(any())).thenReturn(mockCreatedSuperheroResponse());
         when(superheroRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 
-        mockMvc.perform(put("/superheroes/1")
+        mockMvc.perform(put("/api/superheroes/1").header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Superhero"))))
                 .andExpect(status().isBadRequest());
@@ -174,7 +209,10 @@ public class IntegrationTest {
     @Test
     public void testPutSuperheroBadRequest() throws Exception{
 
-        mockMvc.perform(put("/superheroes/1"))
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
+
+        mockMvc.perform(put("/api/superheroes/1").header("Authorization", TOKEN))
                 .andExpect(status().isBadRequest());
     }
 
@@ -182,9 +220,11 @@ public class IntegrationTest {
     @Test
     public void testPutSuperheroNotFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.existsById(any())).thenReturn(false);
 
-        mockMvc.perform(put("/superheroes/999999")
+        mockMvc.perform(put("/api/superheroes/999999").header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new SuperheroRequestDTO("Batman", "DC Superhero"))))
                 .andExpect(status().isNotFound());
@@ -194,10 +234,12 @@ public class IntegrationTest {
     @Test
     public void testDeleteSuperheroFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.existsById(any())).thenReturn(true);
         doNothing().when(Mockito.spy(superheroRepository)).deleteById(any());
 
-        mockMvc.perform(delete("/superheroes/1"))
+        mockMvc.perform(delete("/api/superheroes/1").header("Authorization", TOKEN))
                 .andExpect(status().isNoContent());
     }
 
@@ -205,9 +247,11 @@ public class IntegrationTest {
     @Test
     public void testDeleteSuperheroNotFound() throws Exception{
 
+        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth(TOKEN));
         when(superheroRepository.existsById(any())).thenReturn(false);
 
-        mockMvc.perform(delete("/superheroes/999999"))
+        mockMvc.perform(delete("/api/superheroes/999999").header("Authorization", TOKEN))
                 .andExpect(status().isNotFound());
     }
 

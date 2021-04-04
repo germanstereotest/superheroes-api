@@ -41,3 +41,7 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+bootJar {
+	archiveFileName = 'superhero-api.jar'
+}
