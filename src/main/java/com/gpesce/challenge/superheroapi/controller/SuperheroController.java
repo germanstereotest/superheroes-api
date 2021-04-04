@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequestMapping(value = "/api")
 public class SuperheroController {
 
     private final SuperheroService superheroService;
