@@ -34,18 +34,12 @@ public class AuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody UserDTO data) {
-        
-        try {
-            String username = data.getUsername();
-            var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
-            String token = jwtTokenProvider.createToken(authentication);
-            Map<Object, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("token", token);
-            return ok(model);
-            // TODO pasar esto al global ex handler
-        } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid username/password supplied");
-        }
+        String username = data.getUsername();
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
+        String token = jwtTokenProvider.createToken(authentication);
+        Map<Object, Object> model = new HashMap<>();
+        model.put("username", username);
+        model.put("token", token);
+        return ok(model);
     }
 }

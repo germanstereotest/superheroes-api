@@ -3,6 +3,7 @@ package com.gpesce.challenge.superheroapi.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -25,4 +26,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = { AuthenticationException.class })
+    protected ResponseEntity<SuperheroErrorApiResponse> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+        return new ResponseEntity<SuperheroErrorApiResponse>(
+                new SuperheroErrorApiResponse("AUTHENTICATION_ERROR",ex.getMessage()),
+                HttpStatus.FORBIDDEN);
+    }
 }
