@@ -36,6 +36,10 @@ public class SecurityConfig {
                 .authorizeRequests(c -> c
                         .antMatchers("/auth/signin").permitAll()
                         .antMatchers("/h2-console/**").permitAll()
+                        //Swagger
+                        .antMatchers("/v2/api-docs", "/swagger-resources",
+                                "/swagger-resources/**", "/configuration/ui", "/configuration/security",
+                                "/swagger-ui.html", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtTokenAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
